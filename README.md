@@ -70,8 +70,6 @@ The geometry includes an inlet, contraction, test section and downstream diffuse
 
 The test section has a square cross-section. Its hydraulic diameter is therefore equal to its width and height.
 
-Project photographs, CAD images and plots can be added to the `figures/` directory as the repository develops.
-
 ## Analytical Model
 
 A MATLAB model was developed to calculate airflow quantities over a nominal velocity range of **5–30 m/s**, using increments of 1 m/s.
