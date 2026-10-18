@@ -86,7 +86,7 @@ A MATLAB model was developed to calculate airflow quantities over a nominal velo
 
 Dynamic pressure is calculated using the incompressible-flow relationship:
 
-$$
+$$\
 q = \frac{1}{2}\rho V^2
 $$
 
@@ -111,9 +111,9 @@ Dynamic pressure increases with the square of velocity under the assumed constan
 
 The Reynolds number is calculated as:
 
-```math
+$$\
 Re = \frac{\rho V D_h}{\mu}
-```
+$$
 
 where `Dₕ` is the hydraulic diameter of the test section.
 
@@ -123,9 +123,9 @@ The model predicts a Reynolds number of approximately **3.22 × 10⁴** at 5 m/s
 
 For incompressible flow, the ideal relationship between differential pressure and velocity is:
 
-```math
+$$\
 V = \sqrt{\frac{2\Delta p}{\rho}}
-```
+$$
 
 where `Δp` represents the difference between stagnation and static pressure under the appropriate pressure convention.
 
