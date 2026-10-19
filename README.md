@@ -40,6 +40,21 @@ The current work focuses on establishing the analytical and experimental foundat
 - Record and examine experimental differential pressure measurements.
 - Identify the limitations of the current setup and the improvements required for quantitative validation.
 
+## Tools and Technologies
+
+**Engineering and Design**
+- Autodesk Fusion 360 — CAD modelling and analytical modelling workflow
+- Onshape — Fan mount design
+
+**Programming and Data Acquisition**
+- MATLAB — Analytical airflow modelling and visualisation
+- Arduino IDE — Microcontroller programming and sensor data acquisition
+- Python — Serial data logging from Arduino
+
+**Fabrication**
+- 3D printing — Contraction, diffuser and fan mount
+- Acrylic fabrication — Test section
+
 ## System Architecture
 
 The project combines three main engineering components.
