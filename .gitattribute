@@ -1,0 +1,5 @@
+
+# GitHub Linguist language classification
+
+*.py linguist-language=Python
+*.html linguist-language=HTML
