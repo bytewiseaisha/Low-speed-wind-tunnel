@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wind Tunnel Control & Data Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background: #f0f2f5; color: #333; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 650px; margin-bottom: 20px; }
+        h2 { margin-top: 0; color: #1a73e8; }
+        button { padding: 10px 18px; font-size: 15px; cursor: pointer; border: none; border-radius: 5px; background: #1a73e8; color: white; margin-right: 10px; font-weight: 600; }
+        button:disabled { background: #dadce0; cursor: not-allowed; }
+        button.stop { background: #d93025; }
+        button.secondary { background: #5f6368; }
+        .control-group { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
+        input[type=range] { width: 100%; margin-top: 10px; accent-color: #1a73e8; }
+        #log { background: #202124; color: #8ab4f8; padding: 15px; height: 220px; overflow-y: scroll; font-family: 'Courier New', Courier, monospace; border-radius: 5px; margin-top: 15px; font-size: 13px; }
+        .stats { display: flex; justify-content: space-between; margin-top: 10px; font-weight: bold; color: #5f6368; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Wind Tunnel Test Dashboard</h2>
+        <p>Control fan throttle via L298N PWM and log differential pressure telemetry directly to CSV.</p>
+        
+        <div>
+            <button id="connectBtn" onclick="connectSerial()">Connect Arduino</button>
+            <button id="stopBtn" class="stop" onclick="stopSerial()" disabled>Stop & Download CSV</button>
+            <button id="zeroBtn" class="secondary" onclick="sendZero()" disabled>Re-Zero Sensor</button>
+        </div>
+
+        <div class="control-group">
+            <label for="speedSlider"><strong>Fan Speed Throttle (PWM): <span id="speedVal">0</span> / 255</strong></label>
+            <input type="range" id="speedSlider" min="0" max="255" value="0" disabled oninput="updateSpeed(this.value)">
+        </div>
+
+        <div class="stats">
+            <span>Captured Samples: <span id="sampleCount">0</span></span>
+            <span>Current Flow Pressure: <span id="currentP">0.00</span> Pa</span>
+        </div>
+
+        <div id="log">Status: Disconnected. Click 'Connect Arduino' to begin...</div>
+    </div>
+
+    <script>
+        let port, reader, writer, inputStream, outputStream, keepReading = false;
+        let csvContent = "Time_ms,Pressure_Pa,FanPWM\n";
+        let sampleCount = 0;
+
+        const logDiv = document.getElementById('log');
+        const connectBtn = document.getElementById('connectBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const zeroBtn = document.getElementById('zeroBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedVal = document.getElementById('speedVal');
+        const sampleCountSpan = document.getElementById('sampleCount');
+        const currentPSpan = document.getElementById('currentP');
+
+        function appendLog(text) {
+            logDiv.innerHTML += text + "<br>";
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function connectSerial() {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+
+                connectBtn.disabled = true;
+                stopBtn.disabled = false;
+                zeroBtn.disabled = false;
+                speedSlider.disabled = false;
+                
+                appendLog("Status: Connected successfully at 115200 baud.");
+
+                keepReading = true;
+                const textDecoder = new TextDecoderStream();
+                inputStream = port.readable.pipeTo(textDecoder.writable);
+                reader = textDecoder.readable.getReader();
+
+                outputStream = port.writable;
+                writer = outputStream.getWriter();
+
+                let lineBuffer = "";
+                while (keepReading) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    lineBuffer += value;
+                    let lines = lineBuffer.split("\n");
+                    lineBuffer = lines.pop();
+
+                    for (let line of lines) {
+                        line = line.trim();
+                        if (line.startsWith("#")) {
+                            appendLog(`[Arduino]: ${line}`);
+                            continue;
+                        }
+
+                        let parts = line.split(",");
+                        if (parts.length === 3) {
+                            let t = parts[0];
+                            let p = parts[1];
+                            let pwm = parts[2];
+                            if (!isNaN(t) && !isNaN(p)) {
+                                csvContent += `${t},${p},${pwm}\n`;
+                                sampleCount++;
+                                sampleCountSpan.innerText = sampleCount;
+                                currentPSpan.innerText = parseFloat(p).toFixed(2);
+                                
+                                if (sampleCount % 50 === 0) {
+                                    appendLog(`Logged Sample ${sampleCount} | T: ${t}ms | P: ${p}Pa | PWM: ${pwm}`);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                appendLog(`Error: ${error}`);
+                cleanup();
+            }
+        }
+
+        async function updateSpeed(val) {
+            speedVal.innerText = val;
+            if (writer) {
+                const command = `S${val}\n`;
+                await writer.write(new TextEncoder().encode(command));
+            }
+        }
+
+        async function sendZero() {
+            if (writer) {
+                await writer.write(new TextEncoder().encode("c\n"));
+                appendLog("[Action]: Sent re-zero command to Arduino.");
+            }
+        }
+
+        async function stopSerial() {
+            keepReading = false;
+            if (writer) {
+                await updateSpeed(0); // Kill fan on exit
+                writer.releaseLock();
+            }
+            if (reader) {
+                await reader.cancel();
+            }
+            cleanup();
+            downloadCSV();
+        }
+
+        function cleanup() {
+            connectBtn.disabled = false;
+            stopBtn.disabled = true;
+            zeroBtn.disabled = true;
+            speedSlider.disabled = true;
+            appendLog(`Status: Disconnected. Total logged samples: ${sampleCount}`);
+        }
+
+        function downloadCSV() {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `wind_tunnel_test_${new Date().toISOString().slice(0,10)}_${Date.now()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            appendLog("Status: CSV export downloaded successfully!");
+        }
+    </script>
+</body>
+</html>
