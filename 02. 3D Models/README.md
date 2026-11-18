@@ -1,59 +1,41 @@
-# 3D Models
+# 02. 3D Models
 
-This directory contains the CAD models and fabrication files developed for the low-speed wind tunnel project. The models support the physical construction of the tunnel and preparation of its geometry for computational analysis.
+CAD models of the wind tunnel, designed in Autodesk Fusion.
 
-## Directory Structure
+## Components
 
-```text
-02. 3D Models/
-├── README.md
-├── contraction_diffuser/
-│   ├── contraction_diffuser.f3d
-│   ├── contraction_diffuser.step
-│   └── contraction_diffuser.stl
-├── test_section/
-│   ├── test_section.f3d
-│   └── test_section.step
-└── fan_mount/
-    ├── fan_mount.step
-    └── fan_mount.stl
-```
+| Component | Description | Manufacture |
+|---|---|---|
+| Contraction | Smooth wall profile, 125 mm → 95 mm square, 234.2 mm long | 3D printed (PETG), split into two parts |
+| Diffuser | Smooth wall profile, 95 mm → 125 mm square, 233.9 mm long | 3D printed (PETG), split into two parts |
+| Fan mount | Square frame holding the axial fan at the contraction inlet | 3D printed (PETG) |
+| Test section | 95 × 95 × 310 mm bore, 4 mm walls | Hand-cut 4 mm cast acrylic (not modelled before assembly) |
+| CFD test section | 92 × 92 × 376.7 mm, modelled later for the CFD only | Not manufactured |
 
-## 1. Contraction and Diffuser
+## Printing
 
-**CAD software:** Autodesk Fusion 360  
-**Fabrication:** 3D printing
+| Setting | Value |
+|---|---|
+| Printer | Flashforge Adventurer 5M Pro |
+| Material | Creality CR-PETG, 1.75 mm, black |
+| Nozzle / bed temperature | 245 °C / 80 °C |
+| Nozzle diameter | 0.6 mm |
 
-The contraction and diffuser were designed together in Fusion 360 and fabricated through 3D printing. These sections form the transitions into and out of the wind tunnel test section.
+The contraction and diffuser were too large for the build plate, so each was split in the slicer and the halves bonded after printing.
 
-Files:
-- `.f3d` — Native Fusion 360 design file.
-- `.step` — Neutral CAD exchange format for sharing solid geometry with other engineering software.
-- `.stl` — Mesh geometry for 3D printing.
+## Note on the test section
 
-## 2. Test Section
+The physical test section was assembled by hand from acrylic before any CAD model of it existed. The test section in the CFD model was drawn afterwards and differs slightly in size:
 
-**CAD software:** Autodesk Fusion 360  
-**Physical construction:** Acrylic
+| | Physical | CFD model |
+|---|---|---|
+| Inner bore | 95 × 95 mm | 92 × 92 mm |
+| Outer size | 103 × 103 mm | 100 × 100 mm |
+| Length | 310 mm | 376.667 mm |
+| Contraction ratio | 1.738 | 1.853 |
 
-The test-section geometry was modelled in Fusion 360 after Physical assembly using Acrylic. This was done to define its dimensions and interfaces with the adjacent tunnel sections and provide the geometry for the planned computational fluid dynamics (CFD) analysis.
+This mismatch is one of the sources of difference discussed in the comparison.
 
-Files:
-- `.f3d` — Native Fusion 360 design file.
-- `.step` — Neutral CAD geometry for interoperability and downstream engineering workflows.
+## Air block
 
-## 3. Fan Mount
-
-**CAD software:** Onshape  
-**Fabrication:** 3D printing
-
-The fan mount was designed in Onshape and fabricated through 3D printing.
-
-Files:
-- `.step` — Neutral CAD exchange format for sharing the solid geometry.
-- `.stl` — Mesh geometry used for 3D printing.
-
-## File Formats
-
-The native CAD files preserve the designs in their original software, while STEP files support geometry exchange across CAD applications and STL files provide mesh geometry for fabrication.
-
+For the CFD, the tunnel's internal volume was extracted in Fusion as a single solid (`Body4`) and exported as a STEP file. See `03. CFD Model/wind_tunnel_air_block.step`.
