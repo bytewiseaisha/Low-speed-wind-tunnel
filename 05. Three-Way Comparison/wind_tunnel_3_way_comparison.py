@@ -16,7 +16,7 @@ import seaborn as sns
 sns.set_theme(style="whitegrid", palette="muted")
 
 # Loading the SimScale DataSet
-sim_df = pd.read_csv('simscale_combined_results.csv')
+sim_df = pd.read_csv('../03. CFD Model/simscale_combined_results.csv')
 
 # Extracting velocity and CFD pressure drop (Delta P = P_face33 - P_face71)
 v_sim = sim_df['Test_Velocity_V_test_ms'].values
@@ -27,8 +27,8 @@ rho = 1.225  # Air density in kg/m^3
 q_analytical = 0.5 * rho * (v_sim ** 2)
 
 # Loading and Processing Experimental Data
-exp1 = pd.read_csv('wind_tunnel_test_1.csv')
-exp2 = pd.read_csv('wind_tunnel_test_2.csv')
+exp1 = pd.read_csv('../04. Experimental Investigation/Run_01.csv')
+exp2 = pd.read_csv('../04. Experimental Investigation/Run_02.csv')
 
 # Concatenating both experimental test runs into a single dataframe
 exp_combined = pd.concat([exp1, exp2], ignore_index=True)
