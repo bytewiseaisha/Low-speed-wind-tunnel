@@ -1,210 +1,71 @@
 # Experimental Validation of Analytical and Computational Low-Speed Flow Models
 
-**Analytical Modelling · Computational Fluid Dynamics · Experimental Aerodynamics**
+A 1D analytical model and a CFD model of low-speed internal flow, and a purpose-built wind tunnel to validate them experimentally.
 
-This project investigates low-speed airflow through a purpose-built wind tunnel using analytical modelling, computational fluid dynamics (CFD) and experimental measurements.
+**Author:** Aisha Awofeso · **Period:** May – November 2026
 
-The work combines theoretical flow modelling, wind tunnel design and fabrication, numerical simulations in SimScale, and an Arduino-based pressure measurement system. The resulting datasets are brought together for comparison, providing different perspectives on airflow behaviour within the wind tunnel.
+---
 
-## Project Overview
+## Overview
 
-The central aim of this project is to investigate low-speed airflow in a wind tunnel test section and examine how analytical and computational predictions compare with measurements obtained from a physical setup.
-
-The investigation is organised around three main components:
-
-1. **Analytical Modelling:** A MATLAB model estimates airflow parameters, including dynamic pressure and Reynolds number, over a specified velocity range.
-2. **Computational Fluid Dynamics:** A wind tunnel model is analysed in SimScale to obtain numerical flow data, including velocity and pressure quantities.
-3. **Experimental Investigation:** A fabricated wind tunnel and an Arduino-based differential pressure measurement system are used to acquire experimental data.
-
-The outputs from these investigations are processed and brought together through a Python-based three-way comparison.
-
-## Project Objectives
-
-- Develop an analytical model for estimating key low-speed airflow parameters.
-- Design and fabricate a physical wind tunnel for experimental investigation.
-- Develop a computational model of the wind tunnel and obtain CFD results.
-- Implement a differential pressure measurement and data acquisition system.
-- Acquire and process experimental measurements from the physical setup.
-- Consolidate and compare analytical, computational and experimental datasets.
-- Examine differences between the approaches and identify factors that may influence their agreement.
-
-## Wind Tunnel Design
-
-The wind tunnel was designed in Fusion 360 and fabricated to provide a physical platform for low-speed airflow investigation.
-
-Its main sections include an inlet, contraction, test section and diffuser. The contraction reduces the flow area towards the test section, while the diffuser provides a downstream expansion.
-
-### Test-section specifications
-
-| Parameter | Value |
-|---|---:|
-| Width | 0.095 m |
-| Height | 0.095 m |
-| Length | 0.310 m |
-| Cross-sectional area | 0.009025 m² |
-| Hydraulic diameter | 0.095 m |
-
-The test section has a square cross-section, giving a hydraulic diameter equal to its width and height.
-
-## Analytical Modelling
-
-The analytical model was implemented in MATLAB to estimate airflow parameters over a nominal velocity range of **5–30 m/s**, in increments of 1 m/s.
-
-### Assumed air properties
-
-| Property | Symbol | Value |
-|---|---|---:|
-| Air density | ρ | 1.225 kg/m³ |
-| Dynamic viscosity | μ | 1.81 × 10⁻⁵ Pa·s |
-| Test-section hydraulic diameter | Dₕ | 0.095 m |
-
-### Dynamic pressure
-
-Dynamic pressure is calculated using:
-
-\[
-q = \frac{1}{2}\rho V^2
-\]
-
-where:
-- \(q\) is dynamic pressure (Pa).
-- \(\rho\) is air density (kg/m³).
-- \(V\) is airflow velocity (m/s).
-
-### Reynolds number
-
-The Reynolds number is calculated using:
-
-\[
-Re = \frac{\rho V D_h}{\mu}
-\]
-
-where \(D_h\) is the hydraulic diameter of the test section.
-
-### Pitot-based velocity estimation
-
-For incompressible flow, the ideal relationship between differential pressure and velocity is:
-
-\[
-V = \sqrt{\frac{2\Delta p}{\rho}}
-\]
-
-This relationship provides the basis for estimating airflow velocity from an appropriate differential pressure measurement.
-
-## Computational Fluid Dynamics
-
-The wind tunnel was modelled and simulated using **SimScale**.
-
-The CFD investigation produced numerical results for flow quantities at selected locations within the model. Exported simulation data were processed using Python to consolidate the individual CSV files into a combined dataset.
-
-The consolidation process brings together selected velocity, pressure and turbulence-related quantities from the simulation results.
-
-This dataset provides the computational component of the project's three-way comparison.
-
-## Experimental Investigation
-
-The physical wind tunnel was equipped with a differential pressure measurement arrangement for investigating airflow behaviour.
-
-### Experimental equipment
-
-- Fabricated wind tunnel.
-- Arduino Uno microcontroller.
-- MPXV7002DP differential pressure sensor.
-- Pitot tube.
-- Wall pressure tap.
-- Fixed-speed fan.
-
-The Pitot tube and wall pressure tap are connected to opposite ports of the differential pressure sensor.
-
-### Pressure connection convention
-
-The Pitot tube is connected to the sensor's upper pressure port, while the wall pressure tap is connected to the lower port.
-
-The sign of the measured differential pressure depends on the orientation of these connections and the adopted pressure convention. Recorded pressure values must therefore be interpreted with the sensor-port arrangement in mind.
-
-### Data acquisition
-
-The Arduino acquisition program reads the analogue sensor output, converts it into a pressure estimate and records timestamped measurements.
-
-The acquisition system includes:
-
-- Oversampling of 64 analogue readings per reported measurement.
-- A nominal logging interval of approximately 20 ms.
-- Timestamped pressure output.
-- A startup zeroing routine.
-- Commands for requesting a new zero reference and examining zero drift.
-
-Experimental measurements were recorded in CSV format for subsequent processing and analysis.
-
-## Three-Way Comparison
-
-A Python-based analysis brings together the analytical, computational and experimental datasets.
-
-The comparison is intended to examine how the three approaches represent airflow behaviour under corresponding conditions and to identify differences between their outputs.
-
-The three datasets provide complementary perspectives:
-
-| Approach | Data source | Role |
+| Stage | Tool | What it does |
 |---|---|---|
-| Analytical | MATLAB model | Theoretical predictions |
-| Computational | SimScale CFD results | Numerical flow predictions |
-| Experimental | Physical wind tunnel measurements | Observed system response |
+| Analytical model | MATLAB | 1D continuity + Bernoulli: dynamic pressure, Reynolds number, axial velocity and pressure profiles |
+| CAD + fabrication | Fusion 360, FDM printing | Contraction, diffuser and fan mount printed in PETG; acrylic test section |
+| CFD model | SimScale | Steady incompressible k-ω SST, 26-case parametric velocity sweep |
+| Experiment | Arduino, MPXV7002DP, Pitot-static | PWM fan control (L298N), browser dashboard, 50 Hz CSV logging |
+| Comparison | Python | Verification (CFD vs analytical) and validation (models vs experiment) |
 
-The comparison provides a basis for examining the relationship between theoretical models, numerical simulations and measurements from the fabricated wind tunnel.
+## Key results
 
-## Current Scope and Limitations
+| Quantity | Value |
+|---|---|
+| Velocity range modelled | 5 – 30 m/s |
+| Dynamic pressure (analytical) | 15.3 – 551.3 Pa |
+| Reynolds number (D_h = 95 mm) | 3.2 × 10⁴ – 1.9 × 10⁵ |
+| CFD pressure drop, inlet → test section | 40.5 – 1373.1 Pa, ΔP ∝ V^1.97 (R² = 0.99996) |
+| **Verification:** CFD vs 1D analytical (like for like) | Within 3% over 15 – 30 m/s (mean 3.4% over full sweep) |
+| Experimental signal at full fan speed | ≈ 1 Pa (≈ 1.2 m/s), rising steadily with PWM |
+| **Validation** | Incomplete: measured speeds lie below the modelled range |
 
-The project has progressed from analytical modelling and physical fabrication to CFD simulation, experimental data acquisition and dataset comparison.
+The experimental signal was smaller than one ADC step of the sensor (≈ 4.9 Pa) and was resolved only through 64× oversampling. The fan and driver current limit and the sensor range kept the flow well below 5 m/s, so no overlapping range exists for a percentage error. The full report explains the causes and the hardware changes needed to complete the validation.
 
-However, the existence of three datasets does not automatically establish direct equivalence between their results.
+## Tunnel geometry
 
-Differences in operating conditions, measurement locations, sensor calibration, modelling assumptions and simulation settings must be considered when interpreting the comparison.
+| Parameter | Physical tunnel | CFD model |
+|---|---|---|
+| Test section (inner) | 95 × 95 × 310 mm | 92 × 92 × 376.7 mm |
+| Contraction length | 234.2 mm | 234.2 mm |
+| Diffuser length | 233.9 mm | 233.9 mm |
+| Contraction ratio | 1.738 | 1.853 |
 
-The experimental runs conducted so far are exploratory. A complete calibration across the nominal 5–30 m/s velocity range and a systematic spatial survey of the test section have not been established.
+The physical test section was assembled by hand from 4 mm acrylic before any test section was drawn in CAD. The CFD test section was modelled afterwards with slightly different dimensions. This mismatch is accounted for in the comparison.
 
-Consequently, the comparison should be interpreted within the scope and limitations of the available data. Further controlled testing and measurement checks would strengthen the basis for quantitative validation.
+## Repository structure
 
-## Repository Structure
-
-The repository is organised into five main sections:
-
-```text
+```
 Low-speed-wind-tunnel/
-│
-├── README.md
-│
-├── 01. analytical-model/
-│
-├── 02. 3D Models/
-│
-├── 03. CFD Model/
-│
-├── 04. Experimental Investigation/
-│
-└── 05. Three-Way Comparison/
+├── 01. analytical-model/            MATLAB 1D model and results
+├── 02. 3D Models/                   Fusion 360 / CAD files for the tunnel
+├── 03. CFD Model/                   SimScale exports, consolidation script, STEP geometry
+├── 04. Experimental Investigation/  Arduino firmware, logging dashboard, run data
+└── 05. Three-Way Comparison/        Comparison script and plots
 ```
 
-Each section contains the files and resources associated with its respective stage of the investigation.
+Each folder has its own README with details.
 
-## Tools and Technologies
+## Workflow
 
-| Tool / Technology | Application |
-|---|---|
-| MATLAB | Analytical airflow modelling |
-| Autodesk Fusion 360 | Wind tunnel CAD design |
-| Onshape | Fan mount design |
-| SimScale | Computational fluid dynamics |
-| Python | Data processing, consolidation and comparison |
-| Arduino IDE | Microcontroller programming |
-| Arduino Uno | Experimental data acquisition |
-| MPXV7002DP | Differential pressure measurement |
-| 3D printing | Fabrication of selected wind tunnel components |
-| Git and GitHub | Version control and project documentation |
+1. **Analytical:** run the MATLAB script in `01` → `analytical_results.csv` and plots.
+2. **CAD:** tunnel components in `02`; the internal air volume was exported as `wind_tunnel_air_block.step`.
+3. **CFD:** air block simulated in SimScale; exports merged by `consolidation.py` → `simscale_combined_results.csv`.
+4. **Experiment:** firmware on the Arduino, `logger.html` used to control the fan and log `Run_01.csv` and `Run_02.csv`.
+5. **Comparison:** `comparison.py` loads the CFD and experimental data and produces the plots in `05/Results`.
 
-## Author
+## Tools
 
-**Aisha Awofeso**  
-Systems Engineering  
-University of Lagos, Nigeria
+MATLAB · Autodesk Fusion · SimScale · Python (pandas, NumPy, Matplotlib, seaborn) · Arduino (C++) · HTML / CSS / JavaScript (Web Serial API)
 
-This repository documents the design, modelling, fabrication and investigation of a purpose-built low-speed wind tunnel, bringing together analytical, computational and experimental approaches to airflow characterisation.
+## Hardware
+
+Arduino Uno · MPXV7002DP differential pressure sensor (±2 kPa) · Pitot tube and wall static tap · L298N motor driver · 12 V DC axial fan · Flashforge Adventurer 5M Pro (PETG) · 4 mm cast acrylic
