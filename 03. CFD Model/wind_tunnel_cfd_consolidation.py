@@ -11,16 +11,16 @@ import pandas as pd
 
 # 1. Loading individual SimScale result CSVs exported from parametric run
 print("Loading individual SimScale CSV exports...")
-ux_inlet = pd.read_csv('Wind Tunnel/Ux.csv')
-ux_outlet = pd.read_csv('Wind Tunnel/Ux (1).csv')
-p_inlet = pd.read_csv('Wind Tunnel/p.csv')
-p_outlet = pd.read_csv('Wind Tunnel/p (1).csv')
-k_inlet = pd.read_csv('Wind Tunnel/k.csv')
-k_outlet = pd.read_csv('Wind Tunnel/k (1).csv')
-omega_inlet = pd.read_csv('Wind Tunnel/omega.csv')
-omega_outlet = pd.read_csv('Wind Tunnel/omega (1).csv')
-nut_inlet = pd.read_csv('Wind Tunnel/nut.csv')
-nut_outlet = pd.read_csv('Wind Tunnel/nut (1).csv')
+ux_inlet = pd.read_csv('SimScale Results/Ux.csv')
+ux_outlet = pd.read_csv('SimScale Results/Ux (1).csv')
+p_inlet = pd.read_csv('SimScale Results/p.csv')
+p_outlet = pd.read_csv('SimScale Results/p (1).csv')
+k_inlet = pd.read_csv('SimScale Results/k.csv')
+k_outlet = pd.read_csv('SimScale Results/k (1).csv')
+omega_inlet = pd.read_csv('SimScale Results/omega.csv')
+omega_outlet = pd.read_csv('SimScale Results/omega (1).csv')
+nut_inlet = pd.read_csv('SimScale Results/nut.csv')
+nut_outlet = pd.read_csv('SimScale Results/nut (1).csv')
 
 # 2. Merging all dataframes sequentially on the 'Run #' column
 master_df = (
