@@ -6,21 +6,22 @@ Pressure measurements in the physical tunnel, with PWM fan control and browser-b
 
 | File | Description |
 |---|---|
-| `data_acquisition.ino` | Arduino firmware: sensor reading, zeroing, fan PWM, serial streaming |
-| `logger.html` | Browser dashboard: connect, control fan, re-zero, log and download CSV |
-| `Run_01.csv` | Experimental run 1 (9,262 samples, ≈ 343 s) |
-| `Run_02.csv` | Experimental run 2 (13,076 samples, ≈ 261 s), tubes swapped |
-| `Experimental_Images/` | Build and test photos |
+| `arduino_data_acquisition.ino` | Arduino firmware: sensor reading, zeroing, fan PWM, serial streaming |
+| `web_logger.html` | Browser dashboard: connect, control fan, re-zero, log and download CSV |
+| `Experimental Results/wind_tunnel_test_1.csv` | Run 1 (9,262 samples, ≈ 343 s) |
+| `Experimental Results/wind_tunnel_test_2.csv` | Run 2 (13,076 samples, ≈ 261 s), tubes swapped |
+| `Images/` | Build and test photos |
 
 ## Hardware
 
 | Component | Role |
 |---|---|
-| Arduino Uno | Data acquisition and fan control |
+| Arduino Uno | Data acquisition and fan control, powered over USB |
 | MPXV7002DP (±2 kPa) | Differential pressure between Pitot and wall tap |
 | Pitot tube + wall static tap | Stagnation and static pressure in the test section |
 | L298N | PWM speed control for the fan (ENA = pin 9, IN1 = 7, IN2 = 8) |
-| 12 V DC axial fan (≈ 2.5 A) | Drives the flow |
+| 12 V DC axial fan (≈ 2.5 A, ≈ 30 W) | Drives the flow |
+| 9 V battery | Shared supply for the fan and the L298N |
 
 Sensor output → A0. Fan direction is fixed (IN1 high, IN2 low).
 
@@ -32,14 +33,14 @@ Sensor output → A0. Fan direction is fixed (IN1 high, IN2 low).
 - Streams `Time(ms),Pressure(Pa),FanPWM` at 115200 baud every 20 ms (≈ 50 Hz)
 - Serial commands: `c` re-zeroes the sensor, `S<0–255>` sets the fan PWM
 
-The firmware was first prototyped in the Wokwi Arduino simulator before running on hardware.
+The firmware was first prototyped in the Wokwi Arduino simulator, with a custom MPXV7002DP model, before running on hardware.
 
-## Dashboard (`logger.html`)
+## Dashboard (`web_logger.html`)
 
 Open the file in **Chrome or Edge**, which support the Web Serial API.
 
-1. Upload `data_acquisition.ino` to the Arduino.
-2. Open `logger.html` and click **Connect Arduino**, then select the port.
+1. Upload `arduino_data_acquisition.ino` to the Arduino.
+2. Open `web_logger.html` and click **Connect Arduino**, then select the port.
 3. Use the slider to set fan PWM (0 – 255). **Re-Zero Sensor** re-measures the offset.
 4. Click **Stop & Download CSV** to stop the fan and save the session.
 
@@ -75,6 +76,16 @@ A few rows at the start of each file are stale buffered values from before the A
 
 ## Limitations
 
-- The flow stayed well below the 5 m/s minimum of the models, so validation could not be completed. The likely causes are the fan's pressure capability, the L298N voltage drop and ≈ 2 A current limit, and leakage at the joints.
+The flow stayed well below the 5 m/s minimum of the models, so validation could not be completed. Likely causes, in order of importance:
+
+1. **Power supply:** a single 9 V battery powered both the fan and the driver. A fan rated 12 V, 2.5 A needs about 30 W, and a small 9 V battery sags heavily above a few hundred milliamps. The battery was also replaced at one point during testing, so the supply may differ between runs.
+2. **Driver:** the L298N drops about 2 V internally and is rated for about 2 A per channel, below the fan's rated current.
+3. **Tunnel losses:** the contraction, test section, diffuser and joints add losses, and the joints are not sealed.
+
+Measurement limitations:
+
 - The sensor's ±2 kPa range is far too wide for a ~1 Pa signal.
 - The sensor was zeroed but not calibrated against a reference pressure, and velocity was not measured independently.
+- The Pitot tube was at a single position, so flow uniformity was not assessed.
+
+**Suggested next step:** a 12 V bench supply rated above 3 A, a MOSFET driver rated above the fan current, sealed joints and a lower-range sensor (±125 to ±500 Pa).
