@@ -157,8 +157,8 @@ xline(L_contraction + L_test, '--k', 'Test section end'); %[output:81abf2d0]
 results = table(velocity(:), dynamic_pressure(:), reynolds_number(:), velocity_spatial(:,1), pressure_static_spatial(:,1), ...
     'VariableNames', {'V_test(m/s)', 'q_test(Pa)','Re_test', 'V_inlet(m/s)', 'P_inlet_rel_test(Pa)'});
 
-disp(results)                                   % command window output %[output:99acb64b]
-writetable(results, 'analytical_results.csv');  % csv file
+disp(results)                                                % command window output %[output:99acb64b]
+writetable(results, 'analytical_results_cfd_geometry.csv');  % csv file 
 %%
 % Find all open figure windows
 figs = findobj('Type', 'figure');
