@@ -43,7 +43,7 @@ The main comparison saves its plots in the current folder. Copies are kept in `R
 1. Analytical dynamic pressure q = ½ρV² at the CFD sweep velocities
 2. CFD pressure drop ΔP = p₃₃ − p₇₁ from the consolidated results
 3. Experimental data grouped by fan PWM (mean and standard deviation, groups of ≤ 5 samples dropped)
-4. Experimental velocity from the Pitot relation V = √(2Δp/ρ), using positive readings
+4. Experimental velocity from the Pitot relation V = √(2Δp/ρ), using positive readings (main comparison script, 9 V runs)
 5. Verification: CFD ΔP compared with the MATLAB `P_inlet_rel_test` on the CFD geometry, at matching test-section speeds (V_t = 1.8535 × V_inlet)
 
 ## Outputs
@@ -74,6 +74,6 @@ The CFD is higher at every speed, and the gap shrinks with speed. That matches t
 **Validation (models vs experiment).** The 9 V runs reached ≈ 1 Pa (≈ 1.2 m/s). After the supply was upgraded to an 11.1 V Li-ion pack, the re-run reached ≈ 3.8 Pa (≈ 2.5 m/s), still below the modelled range (5 – 30 m/s). More fundamentally, the experimental points are plotted at velocities calculated from their own pressures with V = √(2Δp/ρ), which is the analytical model itself, so they lie on its curve by construction (`exp_operating_points.png`). The plots show where the rig operated, but cannot confirm or reject the models. Validation needs an independent measurement, such as an inlet static tap or an anemometer (see `04. Experimental Investigation`).
 
 **Data-handling notes:**
-- The two runs have opposite signs (tubes swapped), so combining them cancels the trend in the combined PWM plot. Plotted separately, each run rises steadily with fan speed.
-- Keeping only positive readings biases the derived velocity upward when noise is comparable to the signal.
+- The two 9 V runs have opposite signs (tubes swapped), so combining them cancels the trend in the combined PWM plot. Plotted separately, each run rises steadily with fan speed. The Li-ion re-run used a fixed tube orientation.
+- In the main comparison script, keeping only positive readings biases the derived velocity upward when noise is comparable to the signal.
 - Agreement between the two models is verification, not validation: both share the same idealised geometry and flow assumptions.
