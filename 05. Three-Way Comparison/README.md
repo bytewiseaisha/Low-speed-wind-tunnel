@@ -12,7 +12,8 @@ Compares the analytical model, the CFD and the experiment, in two steps:
 | `wind_tunnel_3_way_comparison.py` | Main comparison: loads the CFD and experimental data and produces the four comparison plots |
 | `wind_tunnel_3_way_comparison.ipynb` | Notebook version of the same script (Google Colab) |
 | `verification_cfd_vs_matlab.py` | Verification on matched geometry: CFD vs the MATLAB model run on the CFD geometry |
-| `telemetry_by_run.py` | Experimental telemetry with the two runs plotted separately |
+| `telemetry_by_run.py` | Experimental telemetry with the two 9 V runs plotted separately |
+| `experimental_figures.py` | Li-ion re-run against 9 V Run 1, and the measured operating points against the modelled range |
 | `Results/` | Output plots |
 
 ## How to run
@@ -28,8 +29,11 @@ python wind_tunnel_3_way_comparison.py
 # Verification on matched geometry
 python verification_cfd_vs_matlab.py "../01. analytical-model/analytical_results_cfd_geometry.csv" "../03. CFD Model/simscale_combined_results.csv" "Results/cmp_verification_cfd_vs_matlab.png"
 
-# Run-by-run telemetry
+# Run-by-run telemetry (9 V runs)
 python telemetry_by_run.py "../04. Experimental Investigation/Experimental Results/wind_tunnel_test_1.csv" "../04. Experimental Investigation/Experimental Results/wind_tunnel_test_2.csv" "Results/exp_telemetry_by_run.png"
+
+# Li-ion re-run and operating points
+python experimental_figures.py "../04. Experimental Investigation/Experimental Results/wind_tunnel_test_1.csv" "../04. Experimental Investigation/Experimental Results/wind_tunnel_test_2.csv" "../04. Experimental Investigation/Experimental Results/wind_tunnel_test_3_liion.csv" "Results/exp_telemetry_liion.png" "Results/exp_operating_points.png"
 ```
 
 The main comparison saves its plots in the current folder. Copies are kept in `Results/`.
@@ -49,7 +53,9 @@ The main comparison saves its plots in the current folder. Copies are kept in `R
 | `analytical_vs_cfd_pressure.png` | q against CFD ΔP over the sweep |
 | `cmp_verification_cfd_vs_matlab.png` | CFD ΔP against the MATLAB model on matched geometry, with % difference |
 | `experimental_telemetry_pressure.png` | Fan PWM against measured pressure, both runs combined |
-| `exp_telemetry_by_run.png` | Fan PWM against measured pressure, each run separately |
+| `exp_telemetry_by_run.png` | Fan PWM against measured pressure, each 9 V run separately |
+| `exp_telemetry_liion.png` | Li-ion re-run (Run 3) against 9 V Run 1 |
+| `exp_operating_points.png` | Measured operating points (9 V and Li-ion) against the analytical curve and modelled range |
 | `analytical_vs_experimental.png` | Experimental points on the analytical curve |
 | `cfd_vs_experimental.png` | Experimental points on the CFD curve |
 
@@ -65,7 +71,7 @@ The main comparison saves its plots in the current folder. Copies are kept in `R
 
 The CFD is higher at every speed, and the gap shrinks with speed. That matches the friction and turbulence losses the 1D model leaves out. The CFD set-up is verified.
 
-**Validation (models vs experiment).** The measured velocities (≈ 0.5 – 1.4 m/s) lie entirely below the modelled range (5 – 30 m/s), and the signal (≈ 1 Pa) is below one ADC step of the sensor. No overlapping range exists for a percentage error, so validation is incomplete. The main cause was the power supply: one 9 V battery for both the fan and its driver (see `04. Experimental Investigation`).
+**Validation (models vs experiment).** The 9 V runs reached ≈ 1 Pa (≈ 1.2 m/s). After the supply was upgraded to an 11.1 V Li-ion pack, the re-run reached ≈ 3.8 Pa (≈ 2.5 m/s), still below the modelled range (5 – 30 m/s). More fundamentally, the experimental points are plotted at velocities calculated from their own pressures with V = √(2Δp/ρ), which is the analytical model itself, so they lie on its curve by construction (`exp_operating_points.png`). The plots show where the rig operated, but cannot confirm or reject the models. Validation needs an independent measurement, such as an inlet static tap or an anemometer (see `04. Experimental Investigation`).
 
 **Data-handling notes:**
 - The two runs have opposite signs (tubes swapped), so combining them cancels the trend in the combined PWM plot. Plotted separately, each run rises steadily with fan speed.
